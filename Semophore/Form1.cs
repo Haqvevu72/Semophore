@@ -52,6 +52,7 @@ namespace Semophore
             }
         }
 
+
         private void Created_Threads_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             string selected_item = Created_Threads.SelectedItem.ToString();
@@ -72,22 +73,35 @@ namespace Semophore
                 {
                     toWait = Created_List[i];
                     Created_List.Remove(toWait);
+                    Waiting_List.Add(toWait);
                     break;
                 }
             }
 
-            semaphoreSlim.Wait();
-            toWait.Start();
-            semaphoreSlim.Release();
+            for (int i = 0; i < Waiting_List.Count; i++)
+            {
+                Waiting_List[i].Start();
+                MessageBox.Show(Waiting_List[i].ThreadState.ToString());
+                Waiting_List.Remove(Waiting_List[i]);
+                Waiting_Names.Remove(Waiting_List[i].Name);
+                Working_List.Add(Waiting_List[i]);
+                Working_Names.Add(Waiting_List[i].Name);
 
+                Working_Threads.DataSource = null;
+                Working_Threads.DataSource = Working_Names ;
 
+                Waiting_Threads.DataSource = null;
+                Waiting_Threads.DataSource = Waiting_Names;
 
-            //Waiting_List.Add(toWait);
+            }
+
         }
 
         private void DoSomething(object? parameter)
         {
+            semaphoreSlim.Wait();
             Console.WriteLine("I am doing something");
+            semaphoreSlim.Release();
         }
     }
 }
